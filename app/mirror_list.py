@@ -1,17 +1,26 @@
 """ manage iterating through mirrors and return appropriate one based by region """
 
+from download_image_map import Parser
 
 class Mirror():
-
-    def __init__(self, mirror_list):
+    """ implements the mirror selection functionality """
+    def __init__(self, mode: str, mirror_list):
+        self.mode = mode
         self.mirror_list = mirror_list
         self._list_position = dict()
         self._list_max = dict()
-        self.mirror_list['default'] = list(
-            mirror_list['NA'] + mirror_list['EU'])
+        self.mirror_list['default'] = list(mirror_list['NA'] + mirror_list['EU'])
+        #pylint: disable=unnecessary-comprehension
+        self.continents = [ continent for continent in mirror_list.keys() ]
         for region in list(mirror_list.keys()):
             self._list_position[region] = 0
             self._list_max[region] = len(mirror_list[region]) - 1
+
+        if mode == "dl_map":
+            parser = Parser('userdata.csv')
+            self.dl_map = parser.parsed_data
+        else:
+            self.dl_map = None
 
     # set defaults to None in param list, then actually set inside
     # body to avoid scope change
@@ -37,4 +46,4 @@ class Mirror():
 
     def all_regions(self):
         """ return list of regions configured """
-        return list(self.mirror_list.keys())
+        return self.continents
